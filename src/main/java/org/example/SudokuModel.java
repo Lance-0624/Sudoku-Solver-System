@@ -62,10 +62,17 @@ public class SudokuModel extends Observable implements ISudokuModel {
         return board[row][col];
     }
 
-    // Updates the cell value and records it for undo
+
+
+    // @requires row >= 0 && row < SIZE && col >= 0 && col < SIZE
+    // @requires !isInitial[row][col]
+    // @ensures board[row][col] == value
+    // @ensures lastRow == row && lastCol == col && lastValue == \old(board[row][col])
     public void setValue(int row, int col, int value) {
-        assert row >= 0 && row < SIZE : "Row index out of bounds";
-        assert col >= 0 && col < SIZE : "Column index out of bounds";
+        // Verify preconditions using assert
+        assert row >= 0 && row < SIZE : "Precondition: Row index out of bounds";
+        assert col >= 0 && col < SIZE : "Precondition: Column index out of bounds";
+        assert !isInitial[row][col] : "Precondition: Cannot modify initial cells";
 
         if (!isInitial[row][col]) {
             // Record state for undo functionality
@@ -74,16 +81,27 @@ public class SudokuModel extends Observable implements ISudokuModel {
             lastValue = board[row][col];
 
             board[row][col] = value;
+
+            // Verify postconditions using assert
+            assert board[row][col] == value : "Postcondition: Value not set correctly";
+
             setChanged();
             notifyObservers();
         }
     }
 
-    // Reverts the last move made by the user
+    // @requires lastRow != -1
+    // @ensures board[lastRow][lastCol] == lastValue
     public void undo() {
+        // Precondition for verification: There must be a revocable operation
+        assert lastRow != -1 : "Precondition: No move to undo";
+
         if (lastRow != -1 && !isInitial[lastRow][lastCol]) {
             board[lastRow][lastCol] = lastValue;
-            // Prevent multiple undos
+
+            // Verify the postconditions
+            assert board[lastRow][lastCol] == lastValue : "Postcondition: Undo failed";
+
             lastRow = -1;
             setChanged();
             notifyObservers();
