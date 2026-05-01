@@ -37,10 +37,10 @@ public class SudokuModel extends Observable implements ISudokuModel {
             }
             scanner.close();
 
-            if (puzzleLine.length() >= 81) {
-                for (int i = 0; i < 81; i++) {
-                    int row = i / 9;
-                    int column = i % 9;
+            if (puzzleLine.length() >= SIZE*SIZE) {
+                for (int i = 0; i < SIZE*SIZE; i++) {
+                    int row = i / SIZE;
+                    int column = i % SIZE;
                     int val = Character.getNumericValue(puzzleLine.charAt(i));
                     board[row][column] = val;
                     isInitial[row][column] = (val != 0);
@@ -108,14 +108,15 @@ public class SudokuModel extends Observable implements ISudokuModel {
         }
     }
 
-    // Provides a hint by filling a valid number in the first empty cell
+    // @requires (\exists int r, c; 0 <= r, c < SIZE; board[r][c] == 0)
+    // @ensures (\exists int r, c; 0 <= r, c < SIZE; board[r][c] != 0)
     public void giveHint() {
         if (!hintEnabled) return;
 
         for (int row = 0; row < SIZE; row++) {
             for (int column = 0; column < SIZE; column++) {
                 if (board[row][column] == 0) {
-                    for (int val = 1; val <= 9; val++) {
+                    for (int val = 1; val <= SIZE; val++) {
                         if (isValid(row, column, val)) {
                             setValue(row, column, val);
                             return;
@@ -189,7 +190,8 @@ public class SudokuModel extends Observable implements ISudokuModel {
         board[row][col] = value;
     }
 
-    // Resets all non-initial cells to zero
+    // @ensures (\forall int r, c; 0 <= r, c < SIZE && !isInitial[r][c]; board[r][c] == 0)
+    // @ensures lastRow == -1
     public void reset() {
         for (int r = 0; r < SIZE; r++) {
             for (int c = 0; c < SIZE; c++) {
@@ -209,10 +211,10 @@ public class SudokuModel extends Observable implements ISudokuModel {
         lastRow = -1;
     }
 
-    // Checks if the board is completely filled and valid
+    // @ensures \result == (board filled and valid according to Sudoku rules)
     public boolean isGameWon() {
         for (int r = 0; r < SIZE; r++) {
-            for (int c = 0; c < 9; c++) {
+            for (int c = 0; c < SIZE; c++) {
                 int val = board[r][c];
                 if (val == 0) return false;
 
