@@ -4,7 +4,9 @@ import java.util.Observable;
 import java.io.File;
 import java.util.Scanner;
 
-public class SudokuModel extends Observable {
+// update Updated SudokuModel implementing the new interface
+public class SudokuModel extends Observable implements ISudokuModel {
+//public class SudokuModel extends Observable {
     public static final int SIZE = 9;
     private int[][] board = new int[SIZE][SIZE];
     private boolean[][] isInitial = new boolean[SIZE][SIZE];
