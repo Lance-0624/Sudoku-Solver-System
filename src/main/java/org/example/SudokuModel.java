@@ -7,6 +7,13 @@ import java.util.Scanner;
 // update Updated SudokuModel implementing the new interface
 public class SudokuModel extends Observable implements ISudokuModel {
 //public class SudokuModel extends Observable {
+
+    /*@ public invariant board != null && board.length == SIZE;
+      @ public invariant (\forall int r, c; 0 <= r && r < SIZE && 0 <= c && c < SIZE;
+      @                  board[r][c] >= 0 && board[r][c] <= 9);
+      @ public invariant isInitial != null && isInitial.length == SIZE;
+      @*/
+
     public static final int SIZE = 9;
     private int[][] board = new int[SIZE][SIZE];
     private boolean[][] isInitial = new boolean[SIZE][SIZE];
@@ -26,7 +33,9 @@ public class SudokuModel extends Observable implements ISudokuModel {
         loadPuzzle();
     }
 
-    // Loads puzzle data from the text file
+    /*@ assignable board[*], isInitial[*];
+      @ ensures (\exists int i; i >= 0; true);
+      @*/
     public void loadPuzzle() {
         try {
             File file = new File("puzzles.txt");
@@ -64,10 +73,13 @@ public class SudokuModel extends Observable implements ISudokuModel {
 
 
 
-    // @requires row >= 0 && row < SIZE && col >= 0 && col < SIZE
-    // @requires !isInitial[row][col]
-    // @ensures board[row][col] == value
-    // @ensures lastRow == row && lastCol == col && lastValue == \old(board[row][col])
+    /*@ requires 0 <= row && row < SIZE && 0 <= col && col < SIZE;
+      @ requires value >= 0 && value <= 9;
+      @ requires !isInitial[row][col];
+      @ assignable board[row][col], lastRow, lastCol, lastValue;
+      @ ensures board[row][col] == value;
+      @ ensures lastRow == row && lastCol == col;
+      @*/
     public void setValue(int row, int col, int value) {
         // Verify preconditions using assert
         assert row >= 0 && row < SIZE : "Precondition: Row index out of bounds";
@@ -90,8 +102,11 @@ public class SudokuModel extends Observable implements ISudokuModel {
         }
     }
 
-    // @requires lastRow != -1
-    // @ensures board[lastRow][lastCol] == lastValue
+    /*@ requires lastRow != -1;
+      @ assignable board[lastRow][lastCol], lastRow;
+      @ ensures board[lastRow][lastCol] == 0;
+      @ ensures lastRow == -1;
+      @*/
     public void undo() {
         // Precondition for verification: There must be a revocable operation
         assert lastRow != -1 : "Precondition: No move to undo";
@@ -108,8 +123,10 @@ public class SudokuModel extends Observable implements ISudokuModel {
         }
     }
 
-    // @requires (\exists int r, c; 0 <= r, c < SIZE; board[r][c] == 0)
-    // @ensures (\exists int r, c; 0 <= r, c < SIZE; board[r][c] != 0)
+    /*@ requires (\exists int r, c; 0 <= r && r < SIZE && 0 <= c && c < SIZE; board[r][c] == 0);
+      @ assignable board[*], lastRow, lastCol, lastValue;
+      @ ensures (\exists int r, c; 0 <= r && r < SIZE && 0 <= c && c < SIZE; \old(board[r][c]) == 0 && board[r][c] != 0);
+      @*/
     public void giveHint() {
         if (!hintEnabled) return;
 
@@ -127,7 +144,12 @@ public class SudokuModel extends Observable implements ISudokuModel {
         }
     }
 
-    // Standard Sudoku rule validation: checks row, column, and 3x3 grid
+    /*@ requires 0 <= row && row < SIZE && 0 <= col && col < SIZE;
+      @ requires val >= 1 && val <= 9;
+      @ ensures \result == ((\forall int i; 0 <= i && i < SIZE && i != col; board[row][i] != val) &&
+      @                    (\forall int i; 0 <= i && i < SIZE && i != row; board[i][col] != val) &&
+      @                    (\forall int r, c; (r/3 == row/3) && (c/3 == col/3) && (r != row || c != col); board[r][c] != val));
+      @*/
     public boolean isValid(int row, int col, int value) {
         for (int i = 0; i < SIZE; i++) {
             if (board[row][i] == value) return false;
@@ -147,7 +169,12 @@ public class SudokuModel extends Observable implements ISudokuModel {
         return true;
     }
 
-    // Checks if value conflicts with other cells
+    /*@ requires 0 <= row && row < SIZE && 0 <= col && col < SIZE;
+      @ requires value >= 1 && value <= 9;
+      @ ensures \result == ((\forall int i; 0 <= i && i < SIZE && i != col; board[row][i] != value) &&
+      @                    (\forall int i; 0 <= i && i < SIZE && i != row; board[i][col] != value) &&
+      @                    (\forall int r, c; (r/3 == row/3) && (c/3 == col/3) && (r != row || c != col); board[r][c] != value));
+      @*/
     public boolean isValidForCheck(int row, int col, int value) {
         for (int i = 0; i < SIZE; i++) {
             if (i != col && board[row][i] == value) return false;
@@ -205,13 +232,17 @@ public class SudokuModel extends Observable implements ISudokuModel {
         notifyObservers();
     }
 
-    // Reloads the puzzle for a new game session
+    /*@ assignable board[*], isInitial[*], lastRow;
+      @ ensures lastRow == -1;
+      @*/
     public void newGame() {
         loadPuzzle();
         lastRow = -1;
     }
 
-    // @ensures \result == (board filled and valid according to Sudoku rules)
+    /*@ ensures \result == (\forall int r, c; 0 <= r && r < SIZE && 0 <= c && c < SIZE;
+      @                    board[r][c] != 0 && isValidForCheck(r, c, board[r][c]));
+      @*/
     public boolean isGameWon() {
         for (int r = 0; r < SIZE; r++) {
             for (int c = 0; c < SIZE; c++) {

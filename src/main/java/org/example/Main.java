@@ -14,7 +14,7 @@ public class Main {
         // Initialize the Controller
         SudokuController controller = new SudokuController(model);
 
-        // We use invokeLater to ensure thread safety for Swing components
+        // Using invokeLater to ensure thread safety for Swing components
         SwingUtilities.invokeLater(() -> {
             new SudokuView(model, controller);
         });
