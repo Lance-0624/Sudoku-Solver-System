@@ -38,6 +38,7 @@ public class SudokuModel extends Observable implements ISudokuModel {
       @*/
     public void loadPuzzle() {
         try {
+            //File file = new File("puzzles.txt");
             File file = new File("puzzles.txt");
             Scanner scanner = new Scanner(file);
             String puzzleLine = "";
