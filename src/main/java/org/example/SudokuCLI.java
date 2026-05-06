@@ -17,6 +17,7 @@ public class SudokuCLI implements Observer {
             if (model.isGameWon()) {
                 System.out.println("\n Congratulations! You completed the Sudoku!");
             }
+            System.out.print("> ");
         }
     }
 
@@ -38,9 +39,10 @@ public class SudokuCLI implements Observer {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\nWelcome to Sudoku CLI!");
         System.out.println("Commands: set <row> <col> <val> (0-8 index), erase <row> <col>, undo, hint, reset, newgame, exit");
+        displayBoard(model);
+        System.out.print("> ");
 
         while (true) {
-            System.out.print("> ");
             String input = scanner.nextLine().trim().toLowerCase();
             String[] parts = input.split("\\s+");
 

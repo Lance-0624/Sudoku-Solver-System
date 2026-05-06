@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -138,25 +139,50 @@ public class SudokuView implements Observer {
         frame.pack();
         frame.setLocationRelativeTo(null);
 
-        // Global monitoring of physical keyboard input
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
-            if (e.getID() == java.awt.event.KeyEvent.KEY_PRESSED) {
-                char keyChar = e.getKeyChar();
-                // Monitor the 1-9 numeric keys
-                if (keyChar >= '1' && keyChar <= '9') {
-                    if (selectedRow != -1 && selectedCol != -1) {
-                        controller.onCellInput(selectedRow, selectedCol, keyChar - '0');
+        // Global physical keyboard listener to fulfill FR6 requirements
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                // Only trigger on KEY_PRESSED to prevent multiple inputs from one key press
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+
+                    // 1. Handle Numeric Input (1-9) for Sudoku cells
+                    if (e.getKeyChar() >= '1' && e.getKeyChar() <= '9') {
+                        if (selectedRow != -1 && selectedCol != -1) {
+                            controller.onCellInput(selectedRow, selectedCol, e.getKeyChar() - '0');
+                        }
+                    }
+
+                    // 2. Handle Erase Function using Backspace or Delete keys
+                    else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE) {
+                        if (selectedRow != -1 && selectedCol != -1) {
+                            controller.onCellInput(selectedRow, selectedCol, 0); // 0 represents an empty cell
+                        }
+                    }
+
+                    // 3. Optional: Professional Grid Navigation using Arrow Keys
+                    else if (e.getKeyCode() == KeyEvent.VK_UP && selectedRow > 0) {
+                        selectedRow--;
+                        updateSelectionHighlight();
+                    } else if (e.getKeyCode() == KeyEvent.VK_DOWN && selectedRow < 8) {
+                        selectedRow++;
+                        updateSelectionHighlight();
+                    } else if (e.getKeyCode() == KeyEvent.VK_LEFT && selectedCol > 0) {
+                        selectedCol--;
+                        updateSelectionHighlight();
+                    } else if (e.getKeyCode() == KeyEvent.VK_RIGHT && selectedCol < 8) {
+                        selectedCol++;
+                        updateSelectionHighlight();
                     }
                 }
-                // Monitor Backspace/Delete key
-                else if (e.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE ||
-                        e.getKeyCode() == java.awt.event.KeyEvent.VK_DELETE) {
-                    if (selectedRow != -1 && selectedCol != -1) {
-                        controller.onCellInput(selectedRow, selectedCol, 0);
-                    }
-                }
+                return false; // Allow the event to be further processed by other components
             }
-            return false;
+
+            // Helper to refresh colors when moving with arrow keys
+            private void updateSelectionHighlight() {
+                clearSelectionColor();
+                cells[selectedRow][selectedCol].setBackground(new Color(200, 230, 255));
+            }
         });
 
         frame.setVisible(true);
