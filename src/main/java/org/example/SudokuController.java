@@ -9,7 +9,10 @@ public class SudokuController {
 
     // deal the view input request
     public void onCellInput(int row, int col, int value) {
-        model.setValue(row, col, value);
+        // If it is an initial grid, ignore it directly to prevent assert from causing crashes
+        if (!model.isInitial(row, col)) {
+            model.setValue(row, col, value);
+        }
     }
 
     public void undo() { model.undo(); }
@@ -24,4 +27,8 @@ public class SudokuController {
     public void setRandomPuzzle(boolean random) {
         model.setRandomPuzzle(random);
     }
+
+    public void setHintEnabled(boolean enabled) { model.setHintEnabled(enabled); }
+
+
 }

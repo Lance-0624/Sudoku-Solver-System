@@ -53,7 +53,15 @@ public class SudokuCLI implements Observer {
                 switch (parts[0]) {
                     case "set":
                         if (parts.length == 4) {
-                            model.setValue(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+                            int r = Integer.parseInt(parts[1]);
+                            int c = Integer.parseInt(parts[2]);
+                            int v = Integer.parseInt(parts[3]);
+
+                            // CLI outputs messages for invalid moves
+                            if (model.isValidationEnabled() && v != 0 && !model.isValidForCheck(r, c, v)) {
+                                System.out.println("Warning: Invalid move according to Sudoku rules!");
+                            }
+                            model.setValue(r, c, v);
                         } else {
                             System.out.println("Usage: set <row> <col> <val>");
                         }

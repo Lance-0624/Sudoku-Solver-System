@@ -117,6 +117,10 @@ public class SudokuView implements Observer {
             controller.setRandomPuzzle(randomBox.isSelected());
         });
 
+        JCheckBox hintBox = new JCheckBox("Hint Enabled", true);
+        hintBox.addActionListener(e -> controller.setHintEnabled(hintBox.isSelected()));
+        actionPanel.add(hintBox);
+
         actionPanel.add(undoBtn);
         actionPanel.add(eraseBtn);
         actionPanel.add(hintBtn);
@@ -124,6 +128,7 @@ public class SudokuView implements Observer {
         actionPanel.add(newGameBtn);
         actionPanel.add(valBox);
         actionPanel.add(randomBox);
+        actionPanel.add(hintBox);
 
         southPanel.add(keypad, BorderLayout.NORTH);
         southPanel.add(actionPanel, BorderLayout.SOUTH);
@@ -132,6 +137,28 @@ public class SudokuView implements Observer {
         frame.add(southPanel, BorderLayout.SOUTH);
         frame.pack();
         frame.setLocationRelativeTo(null);
+
+        // Global monitoring of physical keyboard input
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            if (e.getID() == java.awt.event.KeyEvent.KEY_PRESSED) {
+                char keyChar = e.getKeyChar();
+                // Monitor the 1-9 numeric keys
+                if (keyChar >= '1' && keyChar <= '9') {
+                    if (selectedRow != -1 && selectedCol != -1) {
+                        controller.onCellInput(selectedRow, selectedCol, keyChar - '0');
+                    }
+                }
+                // Monitor Backspace/Delete key
+                else if (e.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE ||
+                        e.getKeyCode() == java.awt.event.KeyEvent.VK_DELETE) {
+                    if (selectedRow != -1 && selectedCol != -1) {
+                        controller.onCellInput(selectedRow, selectedCol, 0);
+                    }
+                }
+            }
+            return false;
+        });
+
         frame.setVisible(true);
     }
 
