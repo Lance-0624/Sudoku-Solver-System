@@ -41,20 +41,43 @@ public class SudokuModel extends Observable implements ISudokuModel {
             //File file = new File("test_win.txt");
             File file = new File("puzzles.txt");
             Scanner scanner = new Scanner(file);
-            String puzzleLine = "";
-            if (scanner.hasNextLine()) {
-                puzzleLine = scanner.nextLine().trim();
+
+            // List to store all valid puzzles from the file
+            java.util.List<String> puzzles = new java.util.ArrayList<>();
+
+            // Read all lines from the file
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+                if (line.length() >= SIZE * SIZE) {
+                    puzzles.add(line);
+                }
             }
             scanner.close();
 
-            if (puzzleLine.length() >= SIZE*SIZE) {
-                for (int i = 0; i < SIZE*SIZE; i++) {
-                    int row = i / SIZE;
-                    int column = i % SIZE;
-                    int val = Character.getNumericValue(puzzleLine.charAt(i));
-                    board[row][column] = val;
-                    isInitial[row][column] = (val != 0);
-                }
+            // Ensure the file wasn't empty
+            if (puzzles.isEmpty()) {
+                System.err.println("Error: No valid puzzles found in the file.");
+                return;
+            }
+
+            String puzzleLine = "";
+
+            // Select puzzle based on the randomPuzzle flag
+            if (this.randomPuzzle && puzzles.size() > 1) {
+                int randomIndex = new java.util.Random().nextInt(puzzles.size());
+                puzzleLine = puzzles.get(randomIndex);
+            } else {
+                // Default to the first puzzle if random is disabled or only 1 puzzle exists
+                puzzleLine = puzzles.get(0);
+            }
+
+            // Parse the selected string and populate the board
+            for (int i = 0; i < SIZE * SIZE; i++) {
+                int row = i / SIZE;
+                int column = i % SIZE;
+                int val = Character.getNumericValue(puzzleLine.charAt(i));
+                board[row][column] = val;
+                isInitial[row][column] = (val != 0);
             }
 
             setChanged();

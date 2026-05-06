@@ -89,21 +89,41 @@ public class SudokuView implements Observer {
         JButton undoBtn = new JButton("Undo");
         undoBtn.addActionListener(e -> controller.undo());
 
+        JButton eraseBtn = new JButton("Erase");
+        eraseBtn.addActionListener(e -> {
+            if (selectedRow != -1 && selectedCol != -1) {
+                controller.onCellInput(selectedRow, selectedCol, 0);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a cell first!");
+            }
+        });
+
         JButton hintBtn = new JButton("Hint");
         hintBtn.addActionListener(e -> controller.giveHint());
 
         JButton resetBtn = new JButton("Reset");
         resetBtn.addActionListener(e -> controller.reset());
 
+        JButton newGameBtn = new JButton("New Game");
+        newGameBtn.addActionListener(e -> controller.newGame());
+
         JCheckBox valBox = new JCheckBox("Validation Feedback", model.isValidationEnabled());
         valBox.addActionListener(e -> {
             controller.setValidation(valBox.isSelected());
         });
 
+        JCheckBox randomBox = new JCheckBox("Random Puzzle", false);
+        randomBox.addActionListener(e -> {
+            controller.setRandomPuzzle(randomBox.isSelected());
+        });
+
         actionPanel.add(undoBtn);
+        actionPanel.add(eraseBtn);
         actionPanel.add(hintBtn);
         actionPanel.add(resetBtn);
+        actionPanel.add(newGameBtn);
         actionPanel.add(valBox);
+        actionPanel.add(randomBox);
 
         southPanel.add(keypad, BorderLayout.NORTH);
         southPanel.add(actionPanel, BorderLayout.SOUTH);

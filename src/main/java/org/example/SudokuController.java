@@ -18,4 +18,10 @@ public class SudokuController {
     public void setValidation(boolean enabled) {
         model.setValidationEnabled(enabled);
     }
+    public void newGame() { model.newGame(); }
+
+    // deal the view input request
+    public void setRandomPuzzle(boolean random) {
+        model.setRandomPuzzle(random);
+    }
 }

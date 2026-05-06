@@ -19,6 +19,8 @@ public class Main {
             new SudokuView(model, controller);
         });
 
+        // Start the CLI interaction loop on the main thread
+        cli.start(model);
         System.out.println("Sudoku System Initialized with both CLI and GUI support.");
     }
 }
