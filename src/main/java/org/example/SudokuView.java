@@ -120,7 +120,6 @@ public class SudokuView implements Observer {
 
         JCheckBox hintBox = new JCheckBox("Hint Enabled", true);
         hintBox.addActionListener(e -> controller.setHintEnabled(hintBox.isSelected()));
-        actionPanel.add(hintBox);
 
         actionPanel.add(undoBtn);
         actionPanel.add(eraseBtn);
