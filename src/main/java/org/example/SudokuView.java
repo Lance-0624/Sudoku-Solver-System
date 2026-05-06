@@ -8,7 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class SudokuView implements Observer {
-    private SudokuModel model;
+    private ISudokuModel model;
     private SudokuController controller;
     private JFrame frame;
 

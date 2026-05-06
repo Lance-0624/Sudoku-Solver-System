@@ -1,7 +1,7 @@
 package org.example;
 
 public class SudokuController {
-    private SudokuModel model;
+    private ISudokuModel model;
 
     public SudokuController(SudokuModel model) {
         this.model = model;
