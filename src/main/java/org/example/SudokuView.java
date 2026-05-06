@@ -18,12 +18,12 @@ public class SudokuView implements Observer {
     private int selectedRow = -1;
     private int selectedCol = -1;
 
-    public SudokuView(SudokuModel model, SudokuController controller) {
+    public SudokuView(ISudokuModel model, SudokuController controller) {
         this.model = model;
         this.controller = controller;
         model.addObserver(this);
         createGui();
-        update(model, null);
+        update((Observable)model, null);
     }
 
     private void createGui() {
