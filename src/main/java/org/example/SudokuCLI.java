@@ -27,8 +27,17 @@ public class SudokuCLI implements Observer {
             if (r % 3 == 0 && r != 0) System.out.println("---------------------");
             for (int c = 0; c < 9; c++) {
                 if (c % 3 == 0 && c != 0) System.out.print("| ");
+
+                // increase differentiation
                 int val = model.getValue(r, c);
-                System.out.print((val == 0 ? "." : val) + " ");
+                if (model.isInitial(r, c)) {
+                    System.out.print(val + "! ");
+                } else if (val == 0) {
+                    System.out.print(".  ");
+                } else {
+                    System.out.print(val + "  ");
+                }
+
             }
             System.out.println();
         }
@@ -38,6 +47,7 @@ public class SudokuCLI implements Observer {
         this.model = model;
         Scanner scanner = new Scanner(System.in);
         System.out.println("\nWelcome to Sudoku CLI!");
+        System.out.println("The number followed by an exclamation mark indicates that it cannot be modified!");
         System.out.println("Commands: set <row> <col> <val> (0-8 index), erase <row> <col>, undo, hint, reset, newgame, exit");
         displayBoard(model);
         System.out.print("> ");
@@ -62,10 +72,12 @@ public class SudokuCLI implements Observer {
                             // CLI outputs messages for invalid moves
                             if (model.isValidationEnabled() && v != 0 && !model.isValidForCheck(r, c, v)) {
                                 System.out.println("Warning: Invalid move according to Sudoku rules!");
+                                System.out.print("> ");
                             }
                             model.setValue(r, c, v);
                         } else {
                             System.out.println("Usage: set <row> <col> <val>");
+                            System.out.print("> ");
                         }
                         break;
                     case "erase":
@@ -73,6 +85,7 @@ public class SudokuCLI implements Observer {
                             model.setValue(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), 0);
                         } else {
                             System.out.println("Usage: erase <row> <col>");
+                            System.out.print("> ");
                         }
                         break;
                     case "undo":
@@ -89,9 +102,11 @@ public class SudokuCLI implements Observer {
                         break;
                     default:
                         System.out.println("Unknown command.");
+                        System.out.print("> ");
                 }
             } catch (Exception e) {
                 System.out.println("Invalid input format or action.");
+                System.out.print("> ");
             }
         }
     }
